@@ -1,14 +1,8 @@
-package repo
+package port
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
-	"github.com/wralith/aestimatio/server/authservice/internal/domain"
-)
-
-var (
-	ErrUserNotFound = errors.New("user not found")
+	"github.com/wralith/aestimatio/server/authservice/internal/core/domain"
 )
 
 type Repo interface {

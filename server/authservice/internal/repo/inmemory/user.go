@@ -1,9 +1,15 @@
 package inmemory
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
-	"github.com/wralith/aestimatio/server/authservice/internal/domain"
-	"github.com/wralith/aestimatio/server/authservice/internal/repo"
+	"github.com/wralith/aestimatio/server/authservice/internal/core/domain"
+	"github.com/wralith/aestimatio/server/authservice/internal/core/port"
+)
+
+var (
+	ErrUserNotFound = errors.New("user not found")
 )
 
 type InMemoryDB map[uuid.UUID]*domain.User
@@ -12,7 +18,7 @@ type UserRepo struct {
 	db InMemoryDB
 }
 
-func NewUserRepo() repo.Repo {
+func NewUserRepo() port.Repo {
 	db := make(map[uuid.UUID]*domain.User)
 
 	return &UserRepo{
@@ -37,7 +43,7 @@ func (r *UserRepo) Get(id uuid.UUID) (*domain.User, error) {
 		return v, nil
 	}
 
-	return nil, repo.ErrUserNotFound
+	return nil, ErrUserNotFound
 }
 
 // GetByEmail implements repo.Repo
@@ -48,5 +54,5 @@ func (r *UserRepo) GetByEmail(email string) (*domain.User, error) {
 		}
 	}
 
-	return nil, repo.ErrUserNotFound
+	return nil, ErrUserNotFound
 }

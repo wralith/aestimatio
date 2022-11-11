@@ -5,10 +5,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"github.com/wralith/aestimatio/server/authservice/internal/repo"
+	"github.com/wralith/aestimatio/server/authservice/internal/core/port"
 )
 
-var db repo.Repo
+var db port.Repo
 
 func TestMain(m *testing.M) {
 	db = NewUserRepo()
@@ -27,7 +27,7 @@ func TestRepo_Create(t *testing.T) {
 
 func TestRepo_Get(t *testing.T) {
 	_, err := db.Get(uuid.New())
-	require.Equal(t, err, repo.ErrUserNotFound)
+	require.Equal(t, err, ErrUserNotFound)
 
 	username, password, email := "testget", "1234567", "testget@mail.com"
 	created, _ := db.Create(username, password, email)
@@ -46,5 +46,5 @@ func TestRepo_GetByEmail(t *testing.T) {
 	require.True(t, created.Equal(got))
 
 	_, err = db.GetByEmail("invalidemail@invaliddomain.com")
-	require.Equal(t, err, repo.ErrUserNotFound)
+	require.Equal(t, err, ErrUserNotFound)
 }
