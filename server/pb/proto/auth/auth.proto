@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "./gen/auth";
+option go_package = "github.com/wralith/aestimatio/server/pb/gen/auth";
 
 service AuthService {
   rpc Login (LoginRequest) returns (LoginResponse);
