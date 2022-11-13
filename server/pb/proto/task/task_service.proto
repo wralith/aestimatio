@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package task;
+import "task/task.proto";
+
+option go_package = "github.com/wralith/aestimatio/server/pb/gen/task";
+
+service TaskService {
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
+  rpc UpdateTask (UpdateTaskRequest) returns (UpdateTaskResponse);
+  rpc DeleteTask (DeleteTaskRequest) returns (DeleteTaskResponse);
+  rpc ListTasks (ListTasksRequest) returns (stream ListTasksResponse);
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message GetTaskResponse {
+  Task task = 1;
+}
+
+message CreateTaskRequest {
+  string title = 1;
+  string description = 2;
+  int64 deadline_at = 3;
+  
+  string jwt = 50;
+}
+
+message CreateTaskResponse {
+  Task task = 1;
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+
+  string jwt = 50;
+}
+
+message DeleteTaskResponse {
+}
+
+message UpdateTaskRequest {
+  string title = 3;
+  string description = 4;
+  TaskStatus status = 5;
+  int64 started_at = 11;
+  int64 completed_at = 12;
+  int64 deadline_at = 13;
+  int64 abandoned_at = 14;
+}
+
+message UpdateTaskResponse {
+  Task task = 1;
+}
+
+message ListTasksRequest {
+  uint32 limit = 1;
+  uint32 offset = 2;
+
+  string jwt = 50;
+}
+
+message ListTasksResponse {
+  Task task = 1;
+}
