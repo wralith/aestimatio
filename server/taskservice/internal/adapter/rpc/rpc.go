@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"time"
 
 	pb "github.com/wralith/aestimatio/server/pb/gen/task"
 	"github.com/wralith/aestimatio/server/taskservice/internal/core/domain"
@@ -75,7 +76,19 @@ func (h *GRPCHandler) UpdateTaskStatus(ctx context.Context, req *pb.UpdateTaskSt
 		return nil, err
 	}
 
-	res, err := h.service.UpdateStatus(task.ID, domain.TaskStatus(req.GetStatus()))
+	if req.Status == pb.TaskStatus_TASK_STATUS_STARTED {
+		task.Start()
+	} else if req.Status == pb.TaskStatus_TASK_STATUS_COMPLETED || req.Status == pb.TaskStatus_TASK_STATUS_COMPLETED_AFTER_DEADLINE {
+		task.Complete()
+	} else if req.Status == pb.TaskStatus_TASK_STATUS_ABANDONED {
+		task.Abandon()
+	} else if req.Status == pb.TaskStatus_TASK_STATUS_DEADLINE_PASSED {
+		task.Status = domain.STATUS_DEADLINE_PASSED
+	} else {
+		return nil, ErrBadRequest
+	}
+
+	res, err := h.service.Update(task)
 	if err != nil {
 		return nil, err
 	}
@@ -83,18 +96,41 @@ func (h *GRPCHandler) UpdateTaskStatus(ctx context.Context, req *pb.UpdateTaskSt
 	return &pb.UpdateTaskStatusResponse{Task: taskToProtoResponse(res)}, nil
 }
 
-// TODO: UpdateTask implements task.TaskServiceServer
 func (h *GRPCHandler) UpdateTask(ctx context.Context, req *pb.UpdateTaskRequest) (*pb.UpdateTaskResponse, error) {
-	// task, err := h.validateUserAndGetTask(ctx, req.Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	task, err := h.validateUserAndGetTask(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	task.Title = req.Title
+	task.Description = req.Description
+	task.Status = domain.TaskStatus(req.Status)
+	task.StartedAt = time.Unix(req.StartedAt, 0)
+	task.CompletedAt = time.Unix(req.CompletedAt, 0)
+	task.DeadlineAt = time.Unix(req.DeadlineAt, 0)
+	task.AbandonedAt = time.Unix(req.AbandonedAt, 0)
+
+	task, err = h.service.Update(task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UpdateTaskResponse{Task: taskToProtoResponse(task)}, err
 }
 
-// TODO: ListTasks implements task.TaskServiceServer
-func (*GRPCHandler) ListTasks(*pb.ListTasksRequest, pb.TaskService_ListTasksServer) error {
-	// panic("unimplemented")
+func (h *GRPCHandler) ListTasks(req *pb.ListTasksRequest, stream pb.TaskService_ListTasksServer) error {
+	id, err := getUserFromMetadata(stream.Context())
+	if err != nil {
+		return err
+	}
+
+	list := h.service.ListTasks(id, req.Limit, req.Offset)
+
+	for _, task := range list {
+		if err := stream.Send(&pb.ListTasksResponse{Task: taskToProtoResponse(task)}); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
