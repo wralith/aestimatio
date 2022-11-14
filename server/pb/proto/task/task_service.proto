@@ -8,9 +8,13 @@ option go_package = "github.com/wralith/aestimatio/server/pb/gen/task";
 service TaskService {
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
-  rpc UpdateTask (UpdateTaskRequest) returns (UpdateTaskResponse);
-  rpc DeleteTask (DeleteTaskRequest) returns (DeleteTaskResponse);
-  rpc ListTasks (ListTasksRequest) returns (stream ListTasksResponse);
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
+  rpc ListTasks(ListTasksRequest) returns (stream ListTasksResponse);
+  rpc UpdateTaskStatus(UpdateTaskStatusRequest)
+      returns (UpdateTaskStatusResponse);
+  rpc UpdateTaskDetails(UpdateTaskDetailsRequest)
+      returns (UpdateTaskDetailsResponse);
 }
 
 message GetTaskRequest {
@@ -25,8 +29,6 @@ message CreateTaskRequest {
   string title = 1;
   string description = 2;
   int64 deadline_at = 3;
-  
-  string jwt = 50;
 }
 
 message CreateTaskResponse {
@@ -35,14 +37,12 @@ message CreateTaskResponse {
 
 message DeleteTaskRequest {
   string id = 1;
-
-  string jwt = 50;
 }
 
-message DeleteTaskResponse {
-}
+message DeleteTaskResponse {}
 
 message UpdateTaskRequest {
+  string id = 1;
   string title = 3;
   string description = 4;
   TaskStatus status = 5;
@@ -64,5 +64,24 @@ message ListTasksRequest {
 }
 
 message ListTasksResponse {
+  Task task = 1;
+}
+
+message UpdateTaskStatusRequest {
+  string id = 1;
+  TaskStatus status = 2;
+}
+
+message UpdateTaskStatusResponse {
+  Task task = 1;
+}
+
+message UpdateTaskDetailsRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+}
+
+message UpdateTaskDetailsResponse {
   Task task = 1;
 }

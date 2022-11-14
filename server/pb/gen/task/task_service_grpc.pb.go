@@ -27,6 +27,8 @@ type TaskServiceClient interface {
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*UpdateTaskResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error)
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (TaskService_ListTasksClient, error)
+	UpdateTaskStatus(ctx context.Context, in *UpdateTaskStatusRequest, opts ...grpc.CallOption) (*UpdateTaskStatusResponse, error)
+	UpdateTaskDetails(ctx context.Context, in *UpdateTaskDetailsRequest, opts ...grpc.CallOption) (*UpdateTaskDetailsResponse, error)
 }
 
 type taskServiceClient struct {
@@ -105,6 +107,24 @@ func (x *taskServiceListTasksClient) Recv() (*ListTasksResponse, error) {
 	return m, nil
 }
 
+func (c *taskServiceClient) UpdateTaskStatus(ctx context.Context, in *UpdateTaskStatusRequest, opts ...grpc.CallOption) (*UpdateTaskStatusResponse, error) {
+	out := new(UpdateTaskStatusResponse)
+	err := c.cc.Invoke(ctx, "/task.TaskService/UpdateTaskStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *taskServiceClient) UpdateTaskDetails(ctx context.Context, in *UpdateTaskDetailsRequest, opts ...grpc.CallOption) (*UpdateTaskDetailsResponse, error) {
+	out := new(UpdateTaskDetailsResponse)
+	err := c.cc.Invoke(ctx, "/task.TaskService/UpdateTaskDetails", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskServiceServer is the server API for TaskService service.
 // All implementations must embed UnimplementedTaskServiceServer
 // for forward compatibility
@@ -114,6 +134,8 @@ type TaskServiceServer interface {
 	UpdateTask(context.Context, *UpdateTaskRequest) (*UpdateTaskResponse, error)
 	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error)
 	ListTasks(*ListTasksRequest, TaskService_ListTasksServer) error
+	UpdateTaskStatus(context.Context, *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error)
+	UpdateTaskDetails(context.Context, *UpdateTaskDetailsRequest) (*UpdateTaskDetailsResponse, error)
 	mustEmbedUnimplementedTaskServiceServer()
 }
 
@@ -135,6 +157,12 @@ func (UnimplementedTaskServiceServer) DeleteTask(context.Context, *DeleteTaskReq
 }
 func (UnimplementedTaskServiceServer) ListTasks(*ListTasksRequest, TaskService_ListTasksServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListTasks not implemented")
+}
+func (UnimplementedTaskServiceServer) UpdateTaskStatus(context.Context, *UpdateTaskStatusRequest) (*UpdateTaskStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTaskStatus not implemented")
+}
+func (UnimplementedTaskServiceServer) UpdateTaskDetails(context.Context, *UpdateTaskDetailsRequest) (*UpdateTaskDetailsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTaskDetails not implemented")
 }
 func (UnimplementedTaskServiceServer) mustEmbedUnimplementedTaskServiceServer() {}
 
@@ -242,6 +270,42 @@ func (x *taskServiceListTasksServer) Send(m *ListTasksResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _TaskService_UpdateTaskStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).UpdateTaskStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/task.TaskService/UpdateTaskStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).UpdateTaskStatus(ctx, req.(*UpdateTaskStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TaskService_UpdateTaskDetails_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTaskDetailsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskServiceServer).UpdateTaskDetails(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/task.TaskService/UpdateTaskDetails",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskServiceServer).UpdateTaskDetails(ctx, req.(*UpdateTaskDetailsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskService_ServiceDesc is the grpc.ServiceDesc for TaskService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -264,6 +328,14 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTask",
 			Handler:    _TaskService_DeleteTask_Handler,
+		},
+		{
+			MethodName: "UpdateTaskStatus",
+			Handler:    _TaskService_UpdateTaskStatus_Handler,
+		},
+		{
+			MethodName: "UpdateTaskDetails",
+			Handler:    _TaskService_UpdateTaskDetails_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
