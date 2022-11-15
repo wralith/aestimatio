@@ -20,6 +20,16 @@ func NewAuthHandler(svc rpc.AuthClient) *AuthHandler {
 	return &AuthHandler{svc: svc}
 }
 
+// @Summary Login
+// @ID      Auth-Login
+// @Tags    auth
+// @Accept  json
+// @Produce json
+// @Param   credentials body     request.LoginRequest true "User Credentials"
+// @Success 200         {object} response.AuthResponse
+// @Failure 400
+// @Failure 500
+// @Router  /auth/login [post]
 func (h *AuthHandler) Login(c echo.Context) error {
 	var req request.LoginRequest
 	if err := c.Bind(&req); err != nil {
@@ -37,6 +47,16 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.LoginResponseFromProto(res))
 }
 
+// @Summary Register
+// @ID      Auth-Register
+// @Tags    auth
+// @Accept  json
+// @Produce json
+// @Param   credentials body     request.RegisterRequest true "New User Credentials"
+// @Success 200         {object} response.AuthResponse
+// @Failure 400
+// @Failure 500
+// @Router  /auth/register [post]
 func (h *AuthHandler) Register(c echo.Context) error {
 	req := request.RegisterRequest{}
 	if err := c.Bind(&req); err != nil {

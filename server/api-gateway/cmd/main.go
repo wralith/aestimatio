@@ -15,6 +15,20 @@ import (
 	"github.com/wralith/aestimatio/server/api-gateway/pkg/logger"
 )
 
+// @title       Aestimatio API
+// @version     1.0
+// @description Aestimatio API-Gateway.
+
+// @license.name MIT
+
+// @host     localhost:8080
+// @BasePath /
+// @schemes  http
+
+// @securityDefinitions.apikey BearerAuth
+// @in                         header
+// @name                       Authorization
+
 func main() {
 	config := config.Get()
 	logger.InitLogger(config.Logger.Pretty, config.Logger.Level)

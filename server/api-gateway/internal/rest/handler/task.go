@@ -22,6 +22,18 @@ func NewTaskHandler(svc rpc.TaskClient) *TaskHandler {
 	return &TaskHandler{svc: svc}
 }
 
+// @Summary  Get Task
+// @ID       Task-Get
+// @Tags     task
+// @Security BearerAuth
+// @Accept   json
+// @Produce  json
+// @Param    id  path     string true "Task ID"
+// @Success  200 {object} response.TaskResponse
+// @Failure  400
+// @Failure  401
+// @Failure  500
+// @Router   /tasks/{id} [get]
 func (h *TaskHandler) Get(c echo.Context) error {
 	id := c.Param("id")
 	token, err := getAuthHeader(c)
@@ -40,6 +52,18 @@ func (h *TaskHandler) Get(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+// @Summary  Create Task
+// @ID       Task-Create
+// @Tags     task
+// @Security BearerAuth
+// @Accept   json
+// @Produce  json
+// @Param    task body     request.CreateTask true "New Task Data"
+// @Success  201  {object} response.TaskResponse
+// @Failure  400
+// @Failure  401
+// @Failure  500
+// @Router   /tasks [post]
 func (h *TaskHandler) Create(c echo.Context) error {
 	token, err := getAuthHeader(c)
 	if err != nil {
@@ -67,6 +91,18 @@ func (h *TaskHandler) Create(c echo.Context) error {
 	return c.JSON(http.StatusCreated, res)
 }
 
+// @Summary  Delete Task
+// @ID       Task-Delete
+// @Tags     task
+// @Security BearerAuth
+// @Accept   json
+// @Produce  json
+// @Param    id path string true "Task ID"
+// @Success  200
+// @Failure  400
+// @Failure  401
+// @Failure  500
+// @Router   /tasks/{id} [delete]
 func (h *TaskHandler) Delete(c echo.Context) error {
 	id := c.Param("id")
 	token, err := getAuthHeader(c)
@@ -84,6 +120,19 @@ func (h *TaskHandler) Delete(c echo.Context) error {
 	return c.JSON(http.StatusOK, "deleted")
 }
 
+// @Summary  Switch Task Status
+// @ID       Task-Switch
+// @Tags     task
+// @Security BearerAuth
+// @Accept   json
+// @Produce  json
+// @Param    id     path     string true "Task ID"
+// @Param    switch query    int    true "Status"
+// @Success  200    {object} response.TaskResponse
+// @Failure  400
+// @Failure  401
+// @Failure  500
+// @Router   /tasks/{id} [put]
 func (h *TaskHandler) Switch(c echo.Context) error {
 	id := c.Param("id")
 	toQuery := c.QueryParam("switch")
@@ -107,6 +156,19 @@ func (h *TaskHandler) Switch(c echo.Context) error {
 	return c.JSON(http.StatusOK, response.TaskResponseFromProto(task.GetTask()))
 }
 
+// @Summary  List Tasks
+// @ID       Task-List
+// @Tags     task
+// @Security BearerAuth
+// @Accept   json
+// @Produce  json
+// @Param    limit  query   int true "Limit"
+// @Param    offset query   int true "Offset"
+// @Success  200    {array} response.TaskResponse
+// @Failure  400
+// @Failure  401
+// @Failure  500
+// @Router   /tasks/list [get]
 func (h *TaskHandler) List(c echo.Context) error {
 	paramLimit := c.QueryParam("limit")
 	paramOffset := c.QueryParam("offset")
