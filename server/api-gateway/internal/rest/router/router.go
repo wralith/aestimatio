@@ -29,6 +29,9 @@ func New(authH *handler.AuthHandler, taskH *handler.TaskHandler) *router {
 			return nil
 		},
 	}))
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+	}))
 	e.Validator = &vld.Validator{Validator: validator.New()}
 
 	r := &router{Echo: e, authHandler: authH, taskHandler: taskH}

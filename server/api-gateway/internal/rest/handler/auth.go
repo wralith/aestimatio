@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -65,9 +64,6 @@ func (h *AuthHandler) Register(c echo.Context) error {
 	if err := c.Validate(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	fmt.Println(req)
-	fmt.Println(req.ToProto())
 
 	res, err := h.svc.Register(context.TODO(), req.ToProto())
 	if err != nil {
