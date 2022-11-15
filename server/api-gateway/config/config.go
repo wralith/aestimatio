@@ -22,6 +22,7 @@ type LoggerConfig struct {
 
 type ServicesConfig struct {
 	Auth string
+	Task string
 }
 
 func Get() *Config {
@@ -37,7 +38,8 @@ func Get() *Config {
 			Level:  viper.GetString("logger.level"),
 		},
 		Services: ServicesConfig{
-			Auth: viper.GetString("services.auth"),
+			Auth: viper.GetString("services.auth.port"),
+			Task: viper.GetString("services.task.port"),
 		},
 	}
 }

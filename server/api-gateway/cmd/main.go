@@ -19,13 +19,20 @@ func main() {
 	config := config.Get()
 	logger.InitLogger(config.Logger.Pretty, config.Logger.Level)
 
-	authService, err := rpc.NewAuthClient()
+	authService, err := rpc.NewAuthClient(config.Services.Auth)
 	if err != nil {
 		log.Fatal().Err(err)
 	}
-	authHandler := handler.NewAuthHandler(authService)
 
-	r := router.New(authHandler)
+	taskService, err := rpc.NewTaskClient(config.Services.Task)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+
+	authHandler := handler.NewAuthHandler(authService)
+	taskHandler := handler.NewTaskHandler(taskService)
+
+	r := router.New(authHandler, taskHandler)
 
 	go func() {
 		if err := r.Echo.Start(":" + config.Server.Port); err != nil && err != http.ErrServerClosed {

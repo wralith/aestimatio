@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,11 +10,6 @@ import (
 	"github.com/wralith/aestimatio/server/api-gateway/internal/rest/request"
 	"github.com/wralith/aestimatio/server/api-gateway/internal/rest/response"
 	"github.com/wralith/aestimatio/server/api-gateway/internal/rpc"
-)
-
-var (
-	ErrBadRequest = errors.New("bad request")
-	ErrInvalid    = errors.New("invalid request")
 )
 
 type AuthHandler struct {
@@ -29,10 +23,10 @@ func NewAuthHandler(svc rpc.AuthClient) *AuthHandler {
 func (h *AuthHandler) Login(c echo.Context) error {
 	var req request.LoginRequest
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, ErrBadRequest.Error())
+		return c.JSON(http.StatusBadRequest, response.ErrBadRequest.Error())
 	}
 	if err := c.Validate(&req); err != nil {
-		return c.JSON(http.StatusBadRequest, ErrInvalid.Error())
+		return c.JSON(http.StatusBadRequest, response.ErrInvalid.Error())
 	}
 
 	res, err := h.svc.Login(context.TODO(), req.ToProto())
@@ -64,16 +58,12 @@ func (h *AuthHandler) Register(c echo.Context) error {
 }
 
 func (h *AuthHandler) Validate(c echo.Context) error {
-	bearer := c.Request().Header.Get("Authorization")
-	if len(bearer) == 0 {
-		return c.JSON(http.StatusUnauthorized, "unauthorized")
-	}
-	token := strings.Split(bearer, " ")
-	if token[0] != "Bearer" {
-		return c.JSON(http.StatusUnauthorized, "unauthorized")
+	token, err := getAuthHeader(c)
+	if err != nil {
+		return err
 	}
 
-	res := request.ValidateRequest{JWT: token[1]}
+	res := request.ValidateRequest{JWT: token}
 
 	isValid, err := h.svc.Validate(context.TODO(), res.ToProto())
 	if err != nil || !isValid.Valid {
@@ -81,4 +71,16 @@ func (h *AuthHandler) Validate(c echo.Context) error {
 	}
 
 	return nil
+}
+
+func getAuthHeader(c echo.Context) (string, error) {
+	bearer := c.Request().Header.Get("Authorization")
+	if len(bearer) == 0 {
+		return "", c.JSON(http.StatusUnauthorized, "unauthorized")
+	}
+	token := strings.Split(bearer, " ")
+	if token[0] != "Bearer" {
+		return "", c.JSON(http.StatusUnauthorized, "unauthorized")
+	}
+	return token[1], nil
 }

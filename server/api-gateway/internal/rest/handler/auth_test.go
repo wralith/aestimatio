@@ -50,7 +50,7 @@ func TestAuthHandler_Login(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(test.body))
+			req := httptest.NewRequest(http.MethodPost, "/tasks/list", strings.NewReader(test.body))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)

@@ -1,17 +1,14 @@
 package router
 
-import (
-	"net/http"
-
-	"github.com/labstack/echo/v4"
-)
-
 func (r router) initRoutes() {
-	r.Echo.POST("/auth/login", r.handler.Login)
-	r.Echo.POST("/auth/register", r.handler.Register)
+	r.Echo.POST("/auth/login", r.authHandler.Login)
+	r.Echo.POST("/auth/register", r.authHandler.Register)
 
-	g := r.Echo.Group("", r.handler.Authenticate)
-	g.GET("/restricted", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "Hello")
-	})
+	g := r.Echo.Group("/tasks", r.authHandler.Authenticate)
+
+	g.POST("", r.taskHandler.Create)
+	g.GET("/:id", r.taskHandler.Get)
+	g.DELETE("/:id", r.taskHandler.Delete)
+	g.PUT("/:id", r.taskHandler.Switch)
+	g.GET("/list", r.taskHandler.List)
 }

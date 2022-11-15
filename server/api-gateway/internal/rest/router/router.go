@@ -10,11 +10,12 @@ import (
 )
 
 type router struct {
-	Echo    *echo.Echo
-	handler *handler.AuthHandler
+	Echo        *echo.Echo
+	authHandler *handler.AuthHandler
+	taskHandler *handler.TaskHandler
 }
 
-func New(handler *handler.AuthHandler) *router {
+func New(authH *handler.AuthHandler, taskH *handler.TaskHandler) *router {
 	e := echo.New()
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogURI:    true,
@@ -30,7 +31,7 @@ func New(handler *handler.AuthHandler) *router {
 	}))
 	e.Validator = &vld.Validator{Validator: validator.New()}
 
-	r := &router{Echo: e, handler: handler}
+	r := &router{Echo: e, authHandler: authH, taskHandler: taskH}
 	r.initRoutes()
 
 	return r

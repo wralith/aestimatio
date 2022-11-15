@@ -1,7 +1,12 @@
 server:
   port: '8080'
 services:
-  auth: localhost:8081
+  auth:
+    address: localhost
+    port: '8081'
+  task:
+    address: localhost
+    port: '8082'
 logger:
   pretty: true
   level: debug
